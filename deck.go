@@ -15,10 +15,26 @@ type card struct {
 // create a new type deck which is a slice of card struct
 type deck []card
 
+func (c card) toString() string {
+	return c.value + " of " + c.suit
+}
+
+func (d deck) toString() string {
+	var allCardSlice []string
+	for _, cardInDeck := range d {
+		allCardSlice = append(allCardSlice, cardInDeck.toString())
+	}
+	return strings.Join([]string(allCardSlice), ",")
+}
+
+func (c card) print() {
+	fmt.Println(c.toString())
+}
+
 // receiver function of all deck type values
 func (d deck) print() {
-	for i, card := range d {
-		fmt.Println(i, card.toString())
+	for _, card := range d {
+		card.print()
 	}
 }
 
@@ -37,18 +53,6 @@ func newDeck() deck {
 
 func deal(d deck, handSize int) (deck, deck) {
 	return d[:handSize], d[handSize:]
-}
-
-func (c card) toString() string {
-	return c.value + " of " + c.suit
-}
-
-func (d deck) toString() string {
-	var allCardSlice []string
-	for _, cardInDeck := range d {
-		allCardSlice = append(allCardSlice, cardInDeck.toString())
-	}
-	return strings.Join([]string(allCardSlice), ",")
 }
 
 func (d deck) writeToFile(filename string) error {
