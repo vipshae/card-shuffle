@@ -7,34 +7,48 @@ import (
 	"strings"
 )
 
-// create a new type deck which is a slice of strings
-type deck []string
+type card struct {
+	suit  string
+	value string
+}
+
+// create a new type deck which is a slice of card struct
+type deck []card
 
 // receiver function of all deck type values
 func (d deck) print() {
 	for i, card := range d {
-		fmt.Println(i, card)
+		fmt.Println(i, card.toString())
 	}
 }
 
 func newDeck() deck {
-	cards := deck{}
+	newDeck := deck{}
 	cardSuites := []string{"Spades", "Diamonds", "Hearts", "Clubs"}
 	cardValues := []string{"Ace", "Two", "Three", "Four"}
-	for _, suite := range cardSuites {
-		for _, value := range cardValues {
-			cards = append(cards, value+" of "+suite)
+	for _, cardSuite := range cardSuites {
+		for _, cardValue := range cardValues {
+			newCard := card{suit: cardSuite, value: cardValue}
+			newDeck = append(newDeck, newCard)
 		}
 	}
-	return cards
+	return newDeck
 }
 
 func deal(d deck, handSize int) (deck, deck) {
 	return d[:handSize], d[handSize:]
 }
 
+func (c card) toString() string {
+	return c.value + " of " + c.suit
+}
+
 func (d deck) toString() string {
-	return strings.Join([]string(d), ",")
+	var allCardSlice []string
+	for _, cardInDeck := range d {
+		allCardSlice = append(allCardSlice, cardInDeck.toString())
+	}
+	return strings.Join([]string(allCardSlice), ",")
 }
 
 func (d deck) writeToFile(filename string) error {
@@ -49,7 +63,13 @@ func newDeckFromFile(filename string) deck {
 		fmt.Println("Error: ", err)
 		os.Exit(1)
 	}
-	return deck(strings.Split(string(bs), ","))
+	splitStringSplice := strings.Split(string(bs), ",")
+	var cardSplice []card
+	for _, splitString := range splitStringSplice {
+		foundSuite, foundValue, _ := strings.Cut(splitString, " of ")
+		cardSplice = append(cardSplice, card{suit: foundSuite, value: foundValue})
+	}
+	return deck(cardSplice)
 }
 
 func (d deck) shuffle() {
